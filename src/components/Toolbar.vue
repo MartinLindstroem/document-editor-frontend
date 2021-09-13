@@ -1,17 +1,84 @@
 <template>
   <div class="toolbar">
-    <button class="btn" v-on:click="log">Save</button>
+    <select v-model="selected">
+      <option value="" disabled selected hidden>Select document</option>
+      <option
+        v-for="doc in documents"
+        :value="{ _id: doc._id, name: doc.name, content: doc.content }"
+        :key="doc.id"
+      >
+        {{ doc.name }}
+      </option>
+    </select>
+    <!-- <button class="btn" v-on:click="log">log</button> -->
+    <!-- <button class="btn" v-on:click="getAllDocuments">GET</button> -->
+    <button class="btn" v-on:click="saveDocument">Save</button>
   </div>
 </template>
 
 <script>
 export default {
   name: "Toolbar",
-  props: ["editorContent"],
+  props: ["editorContent", "documentName", "documents"],
+  data: function () {
+    return {
+      selected: "",
+    };
+  },
   methods: {
     log: function () {
-      console.log(this.editorContent);
+      console.log(JSON.parse(JSON.stringify(this.selected)));
     },
+    saveDocument: function () {
+      let document = {
+        _id: this.selected._id ? this.selected._id : null,
+        name: this.selected.name ? this.selected.name : this.documentName,
+        content: this.selected.content
+          ? this.selected.content
+          : this.editorContent,
+      };
+      if (this.selected._id) {
+        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/update", {
+          body: JSON.stringify(document),
+          headers: {
+            "content-type": "application/json",
+          },
+          method: "PUT",
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data));
+      } else {
+        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/insert", {
+          body: JSON.stringify(document),
+          headers: {
+            "content-type": "application/json",
+          },
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data));
+      }
+    },
+    selectDocument: function () {
+      this.$emit("select", this.selected);
+    },
+    updateEditorContent() {
+      this.$emit("inputData", this.selected.content);
+    },
+    updateDocName() {
+      this.$emit("inputName", this.selected.name);
+    },
+  },
+  watch: {
+    selected: {
+      handler: "selectDocument",
+    },
+    // editorContent: {
+    //   handler: "updateEditorContent",
+    // },
+    // documentName: {
+    //   handler: "updateDocName",
+    // },
   },
 };
 </script>
