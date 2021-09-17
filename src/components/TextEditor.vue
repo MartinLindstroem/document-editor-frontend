@@ -2,7 +2,6 @@
   <div>
     <form>
       <label for="docName">Document name</label><br />
-      <!-- <input v-model="documentName" type="text" id="docName" /> -->
       <input
         v-if="selectedDoc"
         v-model="selectedDoc.name"
@@ -10,8 +9,13 @@
         id="docName"
       />
       <input v-else v-model="documentName" type="text" id="docName" />
-      <VueTrix v-if="selectedDoc" v-model="selectedDoc.content" autofocus />
-      <VueTrix v-else v-model="editorContent" autofocus />
+      <VueTrix
+        v-if="selectedDoc"
+        v-model="selectedDoc.content"
+        id="textEditor"
+        autofocus
+      />
+      <VueTrix v-else v-model="editorContent" id="textEditor" autofocus />
     </form>
   </div>
 </template>
