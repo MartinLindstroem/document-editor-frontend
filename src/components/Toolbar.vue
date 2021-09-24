@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar">
-    <select v-model="selected">
+    <select @change="joinSocketRoom" v-model="selected">
       <option value="" disabled selected hidden>Select document</option>
       <option
         v-for="doc in documents"
@@ -11,7 +11,6 @@
       </option>
     </select>
     <!-- <button class="btn" v-on:click="log">log</button> -->
-    <!-- <button class="btn" v-on:click="getAllDocuments">GET</button> -->
     <button class="btn" v-on:click="saveDocument">Save</button>
   </div>
 </template>
@@ -24,6 +23,17 @@ export default {
     return {
       selected: "",
     };
+  },
+  sockets: {
+    connect: function () {
+      console.log("socket connected");
+    },
+    doc: function (data) {
+      this.selected = JSON.parse(JSON.stringify(data));
+    },
+    sync: function () {
+      this.$socket.emit("doc", this.selected);
+    },
   },
   methods: {
     log: function () {
@@ -60,25 +70,30 @@ export default {
       }
     },
     selectDocument: function () {
-      this.$emit("select", this.selected);
+      setTimeout(() => {
+        this.$emit("select", this.selected);
+      }, 50);
     },
-    updateEditorContent() {
-      this.$emit("inputData", this.selected.content);
+    updateDocumentLive: function () {
+      // setTimeOut is to prevent this.selected from bugging out if user types too fast
+      setTimeout(() => {
+        this.$socket.emit("doc", this.selected);
+      }, 1);
     },
-    updateDocName() {
-      this.$emit("inputName", this.selected.name);
+    joinSocketRoom: function () {
+      this.$socket.emit("join", this.selected._id);
     },
   },
   watch: {
     selected: {
       handler: "selectDocument",
     },
-    // editorContent: {
-    //   handler: "updateEditorContent",
-    // },
-    // documentName: {
-    //   handler: "updateDocName",
-    // },
+    "selected.content": {
+      handler: "updateDocumentLive",
+    },
+    "selected.name": {
+      handler: "updateDocumentLive",
+    },
   },
 };
 </script>
