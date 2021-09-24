@@ -72,13 +72,13 @@ export default {
     selectDocument: function () {
       setTimeout(() => {
         this.$emit("select", this.selected);
-      }, 50);
+      }, 100);
     },
     updateDocumentLive: function () {
       // setTimeOut is to prevent this.selected from bugging out if user types too fast
       setTimeout(() => {
         this.$socket.emit("doc", this.selected);
-      }, 1);
+      }, 50);
     },
     joinSocketRoom: function () {
       this.$socket.emit("join", this.selected._id);
