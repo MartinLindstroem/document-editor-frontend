@@ -6,9 +6,25 @@
         v-if="selectedDoc"
         v-model="selectedDoc.name"
         type="text"
-        id="docName"
+        id="docInput"
       />
-      <input v-else v-model="documentName" type="text" id="docName" />
+      <input v-else v-model="documentName" type="text" id="docInput" />
+      <br />
+      <label for="authUsers">Users</label><br />
+      <input
+        v-if="selectedDoc"
+        v-model="selectedDoc.auth_users"
+        type="text"
+        id="docInput"
+      />
+      <input
+        v-else
+        v-model="allowedUsers"
+        title="Give users access to the document. Enter the usernames separated with a comma"
+        type="text"
+        placeholder="username1,username2"
+        id="docInput"
+      />
       <VueTrix
         v-if="selectedDoc"
         v-model="selectedDoc.content"
@@ -32,6 +48,7 @@ export default {
     return {
       editorContent: "",
       documentName: "",
+      allowedUsers: "",
     };
   },
   methods: {
@@ -41,6 +58,10 @@ export default {
     updateDocName() {
       this.$emit("inputName", this.documentName);
     },
+    addUsers() {
+      let usersArray = this.allowedUsers.split(",");
+      this.$emit("addUsers", usersArray);
+    },
   },
   watch: {
     editorContent: {
@@ -49,15 +70,19 @@ export default {
     documentName: {
       handler: "updateDocName",
     },
+    allowedUsers: {
+      handler: "addUsers",
+    },
   },
 };
 </script>
 
 <style scoped>
-#docName {
-  margin-bottom: 15px;
-  height: 20px;
-  padding: 5px 5px;
+#docInput {
+  /* border-radius: 20px; */
+  font-size: 1rem;
+  padding: 5px 10px;
+  line-height: 150%;
 }
 </style>
 
