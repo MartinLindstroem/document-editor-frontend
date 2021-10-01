@@ -1,35 +1,44 @@
 <template>
   <div id="app">
-    <Toolbar
+    <Header />
+    <router-view
+      name="toolbar"
       :editorContent="textContent"
       :documentName="docName"
       :documents="docsList"
+      :userList="userList"
       @select="selectDocument"
       @inputData="updateTextContent"
       @inputName="updateDocName"
-    />
-    <TextEditor
+    ></router-view>
+    <router-view
+      name="textEditor"
       @inputData="updateTextContent"
       @inputName="updateDocName"
+      @addUsers="addAllowedUsers"
       :selectedDoc="selectedDoc"
-    />
+    ></router-view>
+    <router-view
+      name="login"
+      @getUserDocuments="getAllUserDocuments"
+    ></router-view>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import TextEditor from "./components/TextEditor.vue";
-import Toolbar from "./components/Toolbar.vue";
+import Header from "./components/Header.vue";
 
 export default {
   name: "App",
   components: {
-    TextEditor,
-    Toolbar,
+    Header,
   },
   data: function () {
     return {
       textContent: "",
       docName: "",
+      userList: "",
       selectedDoc: "",
       docsList: "",
     };
@@ -44,14 +53,28 @@ export default {
     selectDocument(value) {
       this.selectedDoc = value;
     },
-    getAllDocuments: function () {
-      fetch("https://jsramverk-editor-mamv18.azurewebsites.net/getAll")
+    getDocuments: function (value) {
+      this.docsList = value;
+    },
+    addAllowedUsers(value) {
+      this.userList = value;
+    },
+    getAllUserDocuments: function () {
+      fetch(
+        `https://jsramverk-editor-mamv18.azurewebsites.net/getAllByUser/${localStorage.getItem(
+          "user"
+        )}`
+      )
         .then((response) => response.json())
-        .then((data) => (this.docsList = JSON.parse(JSON.stringify(data))));
+        .then((data) => {
+          this.docsList = JSON.parse(JSON.stringify(data));
+        });
     },
   },
   beforeMount() {
-    this.getAllDocuments();
+    if (localStorage.getItem("user")) {
+      this.getAllUserDocuments();
+    }
   },
 };
 </script>
@@ -64,5 +87,9 @@ export default {
   /* text-align: center; */
   color: #2c3e50;
   /* margin-top: 60px; */
+}
+
+* {
+  box-sizing: border-box;
 }
 </style>
