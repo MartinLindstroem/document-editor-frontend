@@ -4,13 +4,18 @@
       <option value="" disabled selected hidden>Select document</option>
       <option
         v-for="doc in documents"
-        :value="{ _id: doc._id, name: doc.name, content: doc.content }"
+        :value="{
+          _id: doc._id,
+          name: doc.name,
+          content: doc.content,
+          auth_users: doc.auth_users,
+        }"
         :key="doc.id"
       >
         {{ doc.name }}
       </option>
     </select>
-    <!-- <button class="btn" v-on:click="log">log</button> -->
+    <button class="btn" v-on:click="log">log</button>
     <button class="btn" v-on:click="saveDocument">Save</button>
   </div>
 </template>
@@ -18,7 +23,7 @@
 <script>
 export default {
   name: "Toolbar",
-  props: ["editorContent", "documentName", "documents"],
+  props: ["editorContent", "documentName", "documents", "user", "userList"],
   data: function () {
     return {
       selected: "",
@@ -37,21 +42,29 @@ export default {
   },
   methods: {
     log: function () {
-      console.log(JSON.parse(JSON.stringify(this.selected)));
+      console.log(this.documents);
     },
     saveDocument: function () {
+      if (typeof this.selected.auth_users === "string") {
+        this.selected.auth_users = this.selected.auth_users.split(",");
+      }
       let document = {
         _id: this.selected._id ? this.selected._id : null,
         name: this.selected.name ? this.selected.name : this.documentName,
         content: this.selected.content
           ? this.selected.content
           : this.editorContent,
+        created_by: localStorage.getItem("user"),
+        auth_users: this.selected.auth_users
+          ? this.selected.auth_users
+          : this.userList,
       };
       if (this.selected._id) {
         fetch("https://jsramverk-editor-mamv18.azurewebsites.net/update", {
           body: JSON.stringify(document),
           headers: {
             "content-type": "application/json",
+            "x-access-token": localStorage.getItem("jwt"),
           },
           method: "PUT",
         })
@@ -62,6 +75,7 @@ export default {
           body: JSON.stringify(document),
           headers: {
             "content-type": "application/json",
+            "x-access-token": localStorage.getItem("jwt"),
           },
           method: "POST",
         })
@@ -103,7 +117,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   width: 100%;
-  height: 30px;
+  height: 50px;
   background-color: rgb(81, 81, 131);
   margin-bottom: 20px;
   padding: 10px;
