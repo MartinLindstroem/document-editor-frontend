@@ -3,6 +3,7 @@ import App from './App.vue'
 import "vue-trix"
 import socketIOClient from "socket.io-client";
 import VueSocketIO from "vue-socket.io";
+import router from "./router/router"
 
 // const ENDPOINT = "http://127.0.0.1:1337";
 const ENDPOINT = "https://jsramverk-editor-mamv18.azurewebsites.net";
@@ -16,5 +17,6 @@ Vue.use(new VueSocketIO({
 Vue.config.productionTip = false
 
 new Vue({
+  router,
   render: h => h(App),
 }).$mount('#app')
