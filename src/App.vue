@@ -60,14 +60,20 @@ export default {
       this.userList = value;
     },
     getAllUserDocuments: function () {
-      fetch(
-        `https://jsramverk-editor-mamv18.azurewebsites.net/getAllByUser/${localStorage.getItem(
-          "user"
-        )}`
-      )
+      fetch("https://jsramverk-editor-mamv18.azurewebsites.net/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: `{userDocuments(username: "${localStorage.getItem(
+            "user"
+          )}") {_id, name, content, created_by, auth_users}}`,
+        }),
+      })
         .then((response) => response.json())
         .then((data) => {
-          this.docsList = JSON.parse(JSON.stringify(data));
+          this.docsList = JSON.parse(JSON.stringify(data.data.userDocuments));
         });
     },
   },
