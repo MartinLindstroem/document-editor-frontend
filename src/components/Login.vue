@@ -4,8 +4,8 @@
     <form class="LoginForm">
       <p hidden id="errorMsg">User not found</p>
       <p hidden id="successMsg">Login successfull!</p>
-      <label for="username">Username</label><br />
-      <input id="usernameInput" v-model="username" type="text" required />
+      <label for="email">Email</label><br />
+      <input id="emailInput" v-model="email" type="text" required />
       <br />
       <br />
       <label for="password">Password</label><br />
@@ -28,7 +28,7 @@
 export default {
   data: function () {
     return {
-      username: "",
+      email: "",
       password: "",
       documents: "",
     };
@@ -37,12 +37,13 @@ export default {
     signInUser: function () {
       const errorMsg = document.getElementById("errorMsg");
       const successMsg = document.getElementById("successMsg");
-      if (this.username && this.password) {
+      if (this.email && this.password) {
         let user = {
-          username: this.username,
+          email: this.email,
           password: this.password,
         };
-        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/login", {
+        // https://jsramverk-editor-mamv18.azurewebsites.net/login
+        fetch("http://localhost:1337/login", {
           body: JSON.stringify(user),
           headers: {
             "content-type": "application/json",
@@ -57,7 +58,7 @@ export default {
               errorMsg.style.visibility = "hidden";
               localStorage.setItem(
                 "user",
-                JSON.parse(JSON.stringify(data.data.user.username))
+                JSON.parse(JSON.stringify(data.data.user.email))
               );
 
               localStorage.setItem(
@@ -65,7 +66,7 @@ export default {
                 JSON.parse(JSON.stringify(data.data.token))
               );
               this.$emit("getUserDocuments");
-              this.username = "";
+              this.email = "";
               this.password = "";
 
               successMsg.removeAttribute("hidden");

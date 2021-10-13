@@ -3,11 +3,11 @@
     <h1>Sign up</h1>
     <form class="registerForm">
       <p hidden id="successMsg">Register successfull!</p>
-      <label for="username">Username</label><br />
+      <label for="email">Email</label><br />
       <input
-        class="usernameInput"
-        id="usernameInput"
-        v-model="username"
+        class="emailInput"
+        id="emailInput"
+        v-model="email"
         type="text"
         required
         minlength="3"
@@ -39,7 +39,7 @@
 export default {
   data: function () {
     return {
-      username: "",
+      email: "",
       password: "",
     };
   },
@@ -47,11 +47,12 @@ export default {
     registerUser: function () {
       const successMsg = document.getElementById("successMsg");
       let user = {
-        username: this.username,
+        email: this.email,
         password: this.password,
       };
-      if (this.username.length >= 3 && this.password.length >= 3) {
-        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/register", {
+      if (this.email.length >= 5 && this.password.length >= 3) {
+        // https://jsramverk-editor-mamv18.azurewebsites.net/register
+        fetch("http://localhost:1337/register", {
           body: JSON.stringify(user),
           headers: {
             "content-type": "application/json",
@@ -66,7 +67,7 @@ export default {
               successMsg.removeAttribute("hidden");
             }
           });
-        this.username = "";
+        this.email = "";
         this.password = "";
       }
     },
