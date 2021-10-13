@@ -5,8 +5,11 @@ import socketIOClient from "socket.io-client";
 import VueSocketIO from "vue-socket.io";
 import router from "./router/router"
 
-// const ENDPOINT = "http://127.0.0.1:1337";
-const ENDPOINT = "https://jsramverk-editor-mamv18.azurewebsites.net";
+if (window.location.hostname === "localhost") {
+  const ENDPOINT = "http://127.0.0.1:1337";
+} else {
+  const ENDPOINT = "https://jsramverk-editor-mamv18.azurewebsites.net";
+}
 const socket = socketIOClient(ENDPOINT);
 
 Vue.use(new VueSocketIO({
