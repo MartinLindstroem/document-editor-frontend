@@ -17,10 +17,12 @@
     </select>
     <button class="btn" v-on:click="log">log</button>
     <button class="btn" v-on:click="saveDocument">Save</button>
+    <button class="btn" v-on:click="createPDF">PDF</button>
   </div>
 </template>
 
 <script>
+import { jsPDF } from "jspdf";
 export default {
   name: "Toolbar",
   props: ["editorContent", "documentName", "documents", "user", "userList"],
@@ -96,6 +98,20 @@ export default {
     },
     joinSocketRoom: function () {
       this.$socket.emit("join", this.selected._id);
+    },
+    createPDF: function () {
+      let doc = new jsPDF("p", "pt", "a4");
+      doc.html(
+        "<div style='width: 550px;'>" + this.selected.content + "</div>",
+        {
+          callback: function (doc) {
+            // doc.output("dataurlnewwindow");
+            window.open(doc.output("bloburl"), "_blank");
+          },
+          x: 10,
+          y: 10,
+        }
+      );
     },
   },
   watch: {
