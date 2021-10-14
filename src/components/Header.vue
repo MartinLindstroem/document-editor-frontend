@@ -6,14 +6,23 @@
       <li>
         <router-link class="nav-link" to="/login">Login</router-link>
       </li>
+      <li class="userDisplay" v-if="this.user">{{ username }}</li>
     </ul>
   </nav>
 </template>
 
 <script>
 export default {
+  props: ["username"],
   data: function () {
-    return {};
+    return {
+      user: null,
+    };
+  },
+  mounted() {
+    if (localStorage.getItem("user")) {
+      this.user = localStorage.getItem("user");
+    }
   },
 };
 </script>
@@ -25,10 +34,11 @@ export default {
 }
 .nav-content {
   padding: 30px;
+  /* display: flex; */
 }
 .nav-content li {
   display: inline;
-  padding: 10px;
+  /* padding: 10px; */
   color: white;
   font-size: 20px;
 }
@@ -38,5 +48,10 @@ export default {
   padding: 10px;
   /* float: left; */
   /* float: right; */
+}
+
+.userDisplay {
+  /* display: inline; */
+  float: right;
 }
 </style>
