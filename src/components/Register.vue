@@ -67,7 +67,6 @@ export default {
               successMsg.removeAttribute("hidden");
             }
           });
-        console.log(this.url);
         this.email = "";
         this.password = "";
       }
