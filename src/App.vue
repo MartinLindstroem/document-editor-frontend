@@ -1,12 +1,13 @@
 <template>
   <div id="app">
-    <Header />
+    <Header :username="loggedInUser" />
     <router-view
       name="toolbar"
       :editorContent="textContent"
       :documentName="docName"
       :documents="docsList"
       :userList="userList"
+      :url="url"
       @select="selectDocument"
       @inputData="updateTextContent"
       @inputName="updateDocName"
@@ -20,9 +21,12 @@
     ></router-view>
     <router-view
       name="login"
+      :url="url"
       @getUserDocuments="getAllUserDocuments"
+      @select="selectDocument"
+      @setUser="setLoggedInUser"
     ></router-view>
-    <router-view></router-view>
+    <router-view :url="url"></router-view>
   </div>
 </template>
 
@@ -41,6 +45,8 @@ export default {
       userList: "",
       selectedDoc: "",
       docsList: "",
+      loggedInUser: "",
+      url: "",
     };
   },
   methods: {
@@ -59,6 +65,9 @@ export default {
     addAllowedUsers(value) {
       this.userList = value;
     },
+    setLoggedInUser(value) {
+      this.loggedInUser = value;
+    },
     getAllUserDocuments: function () {
       fetch("https://jsramverk-editor-mamv18.azurewebsites.net/graphql", {
         method: "POST",
@@ -73,7 +82,6 @@ export default {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
           this.docsList = JSON.parse(JSON.stringify(data.data.userDocuments));
         });
     },
@@ -81,6 +89,12 @@ export default {
   beforeMount() {
     if (localStorage.getItem("user")) {
       this.getAllUserDocuments();
+    }
+
+    if (window.location.hostname === "localhost") {
+      this.url = "http://localhost:1337";
+    } else {
+      this.url = "https://jsramverk-editor-mamv18.azurewebsites.net";
     }
   },
 };
