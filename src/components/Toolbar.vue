@@ -8,6 +8,7 @@
           _id: doc._id,
           name: doc.name,
           content: doc.content,
+          created_by: doc.created_by,
           auth_users: doc.auth_users,
         }"
         :key="doc.id"
@@ -18,17 +19,53 @@
     <button class="btn" v-on:click="log">log</button>
     <button class="btn" v-on:click="saveDocument">Save</button>
     <button class="btn" v-on:click="createPDF">PDF</button>
+    <button type="button" class="btn" @click="showModal = true">
+      Invite user
+    </button>
+    <Modal v-model="showModal" title="Invite user">
+      <form novalidate>
+        <div class="form-group">
+          <label for="inputEmail">Email</label>
+          <input
+            id="inputEmail"
+            type="email"
+            class="emailInput"
+            placeholder="Email"
+            v-model="recipientEmail"
+          />
+        </div>
+        <div class="modal-footer">
+          <button class="sendBtn" type="button" @click="sendEmailInvitation">
+            Invite
+          </button>
+        </div>
+      </form>
+    </Modal>
   </div>
 </template>
 
 <script>
+import VueModal from "@kouts/vue-modal";
+import "@kouts/vue-modal/dist/vue-modal.css";
 import { jsPDF } from "jspdf";
 export default {
   name: "Toolbar",
-  props: ["editorContent", "documentName", "documents", "user", "userList"],
+  props: [
+    "editorContent",
+    "documentName",
+    "documents",
+    "user",
+    "userList",
+    "url",
+  ],
+  components: {
+    Modal: VueModal,
+  },
   data: function () {
     return {
       selected: "",
+      showModal: false,
+      recipientEmail: "",
     };
   },
   sockets: {
@@ -44,10 +81,13 @@ export default {
   },
   methods: {
     log: function () {
-      console.log(this.documents);
+      console.log(this.selected);
     },
     saveDocument: function () {
-      if (typeof this.selected.auth_users === "string") {
+      if (
+        typeof this.selected.auth_users === "string" &&
+        this.selected.auth_users.length > 0
+      ) {
         this.selected.auth_users = this.selected.auth_users.split(",");
       }
       let document = {
@@ -62,7 +102,7 @@ export default {
           : this.userList,
       };
       if (this.selected._id) {
-        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/update", {
+        fetch(this.url + "/update", {
           body: JSON.stringify(document),
           headers: {
             "content-type": "application/json",
@@ -73,7 +113,7 @@ export default {
           .then((response) => response.json())
           .then((data) => console.log(data));
       } else {
-        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/insert", {
+        fetch(this.url + "/insert", {
           body: JSON.stringify(document),
           headers: {
             "content-type": "application/json",
@@ -113,6 +153,39 @@ export default {
         }
       );
     },
+    sendEmailInvitation: function () {
+      const registerLink = window.location.href.slice(0, -6) + "register";
+      if (this.selected) {
+        let body = {
+          to: this.recipientEmail,
+          documentOwner: this.selected.created_by,
+          documentName: this.selected.name,
+          registerLink: registerLink,
+        };
+        this.showModal = false;
+        fetch("https://jsramverk-editor-mamv18.azurewebsites.net/sendInvite", {
+          body: JSON.stringify(body),
+          headers: {
+            "content-type": "application/json",
+          },
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data));
+
+        if (this.selected.auth_users === null) {
+          this.selected.auth_users = this.recipientEmail;
+        } else {
+          this.selected.auth_users.push(this.recipientEmail);
+        }
+
+        this.saveDocument();
+      } else {
+        alert("You need to select a document");
+      }
+      this.showModal = false;
+      this.recipientEmail = "";
+    },
   },
   watch: {
     selected: {
@@ -128,7 +201,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .toolbar {
   display: flex;
   justify-content: flex-start;
@@ -145,6 +218,40 @@ export default {
 
 .btn:hover {
   background-color: #ddd;
+  cursor: pointer;
+}
+
+.modal-footer {
+  padding: 15px 0px 0px 0px;
+  border-top: 1px solid #e5e5e5;
+  margin-left: -14px;
+  margin-right: -14px;
+  display: flex;
+}
+
+.emailInput {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.sendBtn {
+  width: 20%;
+  justify-content: center;
+  margin: 0 auto;
+  background-color: #4caf50;
+  color: #eee;
+  border: none;
+  font-size: 1rem;
+  padding: 7px;
+}
+
+.sendBtn:hover {
+  background-color: #45a049;
   cursor: pointer;
 }
 </style>
