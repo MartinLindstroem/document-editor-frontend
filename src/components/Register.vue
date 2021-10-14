@@ -10,7 +10,7 @@
         v-model="email"
         type="text"
         required
-        minlength="3"
+        minlength="5"
       />
       <br />
       <br />
@@ -37,6 +37,7 @@
 
 <script>
 export default {
+  props: ["url"],
   data: function () {
     return {
       email: "",
@@ -51,8 +52,7 @@ export default {
         password: this.password,
       };
       if (this.email.length >= 5 && this.password.length >= 3) {
-        // https://jsramverk-editor-mamv18.azurewebsites.net/register
-        fetch("http://localhost:1337/register", {
+        fetch(this.url + "/register", {
           body: JSON.stringify(user),
           headers: {
             "content-type": "application/json",
@@ -67,6 +67,7 @@ export default {
               successMsg.removeAttribute("hidden");
             }
           });
+        console.log(this.url);
         this.email = "";
         this.password = "";
       }
