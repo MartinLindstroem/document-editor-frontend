@@ -26,11 +26,13 @@
 
 <script>
 export default {
+  props: ["url"],
   data: function () {
     return {
       email: "",
       password: "",
       documents: "",
+      // selected: "",
     };
   },
   methods: {
@@ -43,7 +45,7 @@ export default {
           password: this.password,
         };
         // https://jsramverk-editor-mamv18.azurewebsites.net/login
-        fetch("http://localhost:1337/login", {
+        fetch(this.url + "/login", {
           body: JSON.stringify(user),
           headers: {
             "content-type": "application/json",
@@ -66,6 +68,8 @@ export default {
                 JSON.parse(JSON.stringify(data.data.token))
               );
               this.$emit("getUserDocuments");
+              this.$emit("select", "");
+              this.$emit("setUser", localStorage.getItem("user"));
               this.email = "";
               this.password = "";
 
