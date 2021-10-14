@@ -18,7 +18,7 @@
     </select>
     <button class="btn" v-on:click="log">log</button>
     <button class="btn" v-on:click="saveDocument">Save</button>
-    <button class="btn" v-on:click="createPDF">PDF</button>
+    <button class="btn" v-on:click="createPDF">View PDF</button>
     <button type="button" class="btn" @click="showModal = true">
       Invite user
     </button>
