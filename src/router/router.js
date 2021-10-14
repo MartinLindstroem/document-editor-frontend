@@ -40,12 +40,6 @@ const router = new VueRouter({
     ]
 })
 
-// router.beforeEach((to, from, next) => {
-//     if (to.name === "register") next({ name: "register" })
-//     else if (to.name !== "login" && !localStorage.getItem("user")) next({ name: "login" })
-//     else next()
-// });
-
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (localStorage.getItem("jwt") == null) {
