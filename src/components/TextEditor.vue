@@ -20,9 +20,9 @@
       <input
         v-else
         v-model="allowedUsers"
-        title="Give users access to the document. Enter the usernames separated with a comma"
+        title="Give users access to the document. Enter the email addresses separated with a comma"
         type="text"
-        placeholder="username1,username2"
+        placeholder="email1,email2"
         id="docInput"
       />
       <VueTrix
